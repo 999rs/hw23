@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "hw23": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
