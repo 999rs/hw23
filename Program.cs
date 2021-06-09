@@ -35,8 +35,6 @@ namespace hw23
         /// <returns></returns>
         public static double GetDouble(string str, string sep)
         {
-            Console.WriteLine($"Введенная строка: {str}");
-            Console.WriteLine($"Введенный разделитель: {sep}");
 
             bool isNegative = false;
 
