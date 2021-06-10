@@ -35,25 +35,33 @@ namespace hw23
         /// <returns></returns>
         public static double GetDouble(string str, string sep)
         {
-
-            bool isNegative = false;
-
-            // определим отрицательное число
-            if (str.Length > 0 && str[0].Equals('-') && !sep.StartsWith("-"))
-            {
-                isNegative = true;
-                str = str.Substring(1, str.Length - 1);
-            }
-
             bool valSepResult = ValidateSep(str, sep);
             bool valDigResult = ValidateDigits(str, sep);
 
             if (valSepResult && valDigResult)
             {
+
+                bool isNegative = false;
+
+                // определим отрицательное число
+                if (str.Length > 0 && str[0].Equals('-') && !sep.StartsWith("-"))
+                {
+                    isNegative = true;
+                    str = str.Substring(1, str.Length - 1);
+                    
+                }
+
+                // обработаем плюс при записи положительного числа
+                if (str.Length > 0 && str[0].Equals('+') && !sep.StartsWith("+"))
+                {
+                    str = str.Substring(1, str.Length - 1);
+                }
+
+
                 string mainStr = str;
                 string subStr = "";
                 // если разделитель присутствует, разделим основную и дробные части
-                if (str.IndexOf(sep) != -1)
+                if (sep.Length > 0 &&  str.IndexOf(sep) != -1)
                 {
                     mainStr = str.Substring(0, (str.IndexOf(sep)));
                     subStr = str.Substring(str.IndexOf(sep) + sep.Length, str.Length - str.IndexOf(sep) - sep.Length);
@@ -75,11 +83,12 @@ namespace hw23
             {
                 string msg = "";
                 if (!valSepResult)
-                    msg += $"Разделитель должен встречаться 1 раз или не встречаться вовсе. Разделитель не может начинаться со знака минус `-`, " +
-                        " \r\n т.к. в таком случае невозможно определить отрицательное число";
+                    msg += $"\r\nРазделитель должен встречаться 1 раз или не встречаться вовсе. Разделитель не может начинаться со знака минус `-` или плюс `+`, " +
+                        " т.к. в таком случае невозможно определить отрицательное число";
 
                 if (!valDigResult)
-                    msg += "\r\nКроме разделителя допустимы лишь символы цифр";
+                    msg += "\r\n В самой строке вне входящего разделителя допустимы лишь символы цифр или лидирующий знак плюса и минуса в единственном числе" + 
+                        " (символы + и - должны встречаться вне разделителя не более одного раза)";
                 throw new Exception(msg);
             }
         }
@@ -98,8 +107,8 @@ namespace hw23
             {
                 return false;
             }
-            // не может начинаться с минуса
-            if (sep.StartsWith("-"))
+            // не может начинаться с минуса или плюса
+            if (sep.StartsWith("-") || sep.StartsWith("+"))
             {
                 return false;
             }
@@ -115,9 +124,17 @@ namespace hw23
         /// <returns>true если прошли проверку</returns>
         public static bool ValidateDigits(string str, string sep)
         {
-            // текст числа должен содержать только цифры
-            var body = (sep.Length == 0) ? "" : str.Replace(sep, "");
+            var body = (sep.Length == 0) ? str : str.Replace(sep, "");
 
+            // символы + и - должны встречаться вне разделителя не более одного раза
+            if (body.Split(new char[2] { '+', '-' }).Length > 2) 
+            {                 
+                return false;
+            }
+
+            body = body.Replace("+", "").Replace("-", "");
+
+            // текст числа должен содержать только цифры
             foreach (var c in body)
             {
                 if (!char.IsDigit(c))
